@@ -1,7 +1,5 @@
 package com.sachin.Login.controller;
 
-import java.util.Collections;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sachin.Login.domain.dtos.AuthResponse;
 import com.sachin.Login.domain.dtos.UserDto;
 import com.sachin.Login.domain.entities.UserModel;
 import com.sachin.Login.service.AuthService;
@@ -35,12 +34,12 @@ public class AuthController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> verify(@RequestBody UserModel user) {
-        String token = service.verify(user);
-        if (token == null) {
+        AuthResponse tokens = service.verify(user);
+        if (tokens == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credential");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap("token", token));
+        return ResponseEntity.ok(tokens);
     }
 
     @GetMapping("/me")
@@ -48,5 +47,12 @@ public class AuthController {
         String email = authentication.getName();
         UserDto name = service.getMe(email);
         return ResponseEntity.ok(name);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+        AuthResponse tokens = service.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(tokens);
+
     }
 }

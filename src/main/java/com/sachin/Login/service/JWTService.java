@@ -20,6 +20,8 @@ import io.jsonwebtoken.Claims;
 @Service
 public class JWTService {
     private String secretKey = "";
+    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24;
+    private final long accessTokenExpiration = 1000 * 60;
 
     public JWTService() {
         try {
@@ -32,17 +34,27 @@ public class JWTService {
     }
 
     public String generateToken(String email) {
-        Map<String, Object> claims = new HashMap<>();
+        return generateToken(new HashMap<>(), email);
+    }
 
+    public String generateToken(Map<String, Object> extraClaims, String email) {
+        return buildToken(extraClaims, email, accessTokenExpiration);
+    }
+
+    public String buildToken(Map<String, Object> extraClaims, String email, long expiration) {
         return Jwts.builder()
                 .claims()
-                .add(claims)
+                .add(extraClaims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .and()
                 .signWith(getKey())
                 .compact();
+    }
+
+    public String generateRefreshToken(String email) {
+        return buildToken(new HashMap<>(), email, refreshTokenExpiration);
     }
 
     private SecretKey getKey() {
@@ -74,11 +86,11 @@ public class JWTService {
         return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 }
