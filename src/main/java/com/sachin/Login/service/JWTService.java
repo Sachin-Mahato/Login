@@ -1,12 +1,10 @@
 package com.sachin.Login.service;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,19 +17,12 @@ import io.jsonwebtoken.Claims;
 
 @Service
 public class JWTService {
-    private String secretKey = "";
-    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24;
-    private final long accessTokenExpiration = 1000 * 60;
 
-    public JWTService() {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-            SecretKey sk = keyGen.generateKey();
-            secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
-        } catch (java.security.NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private final String base64Key = "EpoHB0H+kxb4i3qvqIZz8m81Ez/idpqmHJq3O4cokmE=";
+
+    private final long refreshTokenExpiration = 1000 * 60 * 60 * 24; // 24 hours
+
+    private final long accessTokenExpiration = 1000 * 60; // 1 minute
 
     public String generateToken(String email) {
         return generateToken(new HashMap<>(), email);
@@ -58,7 +49,7 @@ public class JWTService {
     }
 
     private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(base64Key);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

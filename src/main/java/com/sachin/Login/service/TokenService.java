@@ -58,10 +58,10 @@ public class TokenService {
 
     public Optional<String> getValidRefreshToken(UUID userId) {
         return tokenRepository
-                .findById(userId)
+                .findByUserId(userId)
                 .stream()
                 .filter(token -> !token.isRevoked())
-                .filter(token -> !jwtService.isTokenExpired(token.getToken()))
+                .filter(token -> token.getExpire().isAfter(Instant.now()))
                 .findFirst()
                 .map(Token::getToken);
     }

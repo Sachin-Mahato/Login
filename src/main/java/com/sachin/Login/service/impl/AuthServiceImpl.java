@@ -63,7 +63,6 @@ public class AuthServiceImpl implements AuthService {
                 .getValidRefreshToken(id)
                 .orElseGet(() -> tokenService.createRefreshToken(user.getEmail())
                         .getToken());
-        System.out.printf("refreshToken: \n", refreshToken);
         return new AuthResponse(accessToken, refreshToken);
     }
 
