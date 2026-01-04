@@ -1,6 +1,8 @@
 package com.sachin.Login.service.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -31,4 +33,25 @@ public class FileServiceImpl implements FileService {
         return fileRepository
                 .findAll().stream().map(fileDtoMapper).collect(Collectors.toList());
     }
+
+    @Override
+    public FileDto updateSourceCode(UUID id, Map<String, Object> fields) {
+        FileModel existingSourceCode = fileRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("File not found" + id));
+
+        fields.forEach((key, value) -> {
+            if ("sourceCode".equals(key)) {
+                if (!(value instanceof String)) {
+                    throw new IllegalArgumentException("sourceCode must be string");
+                }
+                existingSourceCode.setSourceCode((String) value);
+            } else {
+                throw new IllegalArgumentException("Unsupported fields" + value);
+            }
+        });
+        
+        FileModel saveSourceCode = fileRepository.save(existingSourceCode);
+        return fileDtoMapper.apply(saveSourceCode);
+    }
+
 }

@@ -9,14 +9,18 @@ import com.sachin.Login.security.UserPrincipal;
 import com.sachin.Login.service.FileService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 public class FileController {
@@ -53,6 +57,12 @@ public class FileController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(allFiles);
+    }
+
+    @PatchMapping("/files/{id}")
+    public ResponseEntity<?> updateFileSourceCode(@PathVariable UUID id, @RequestBody Map<String, Object> fields) {
+        fileService.updateSourceCode(id, fields);
+        return ResponseEntity.status(HttpStatus.OK).body("source code update successfully.");
     }
 
 }

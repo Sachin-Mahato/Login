@@ -36,7 +36,7 @@ public class FileModel {
     @Column(name = "language", nullable = false)
     private Language language;
 
-    @Column(name = "source_code", nullable = false)
+    @Column(name = "source_code", nullable = false, columnDefinition = "TEXT")
     private String sourceCode;
 
     @CreationTimestamp
